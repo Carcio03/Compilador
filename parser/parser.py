@@ -1,4 +1,17 @@
 import ply.yacc as yacc
+from parser.semantics import SemanticAnalyzer
+
+# Dentro de la función donde se maneja el AST tras el parseo exitoso
+semantic_analyzer = SemanticAnalyzer()
+
+# Analizar el AST generado por el parser
+def analyze_semantics(ast):
+    try:
+        semantic_analyzer.analyze(ast)
+        return "Análisis semántico exitoso"
+    except Exception as e:
+        return str(e)
+
 
 # Definir los tokens
 tokens = (
@@ -108,7 +121,7 @@ def p_statement(p):
     '''statement : assignment
                  | if_statement
                  | while_statement
-                 | do_until_statement
+                 | do_while_statement
                  | write_statement
                  | read_statement
                  | block'''
@@ -134,9 +147,9 @@ def p_while_statement(p):
     '''while_statement : WHILE expression LBRACE statements RBRACE'''
     p[0] = ('while', p[2], p[4])
 
-def p_do_until_statement(p):
-    '''do_until_statement : DO LBRACE statements RBRACE UNTIL expression SEMICOLON'''
-    p[0] = ('do_until', p[3], p[6])
+def p_do_while_statement(p):
+    '''do_while_statement : DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON'''
+    p[0] = ('do_while', p[3], p[7])
 
 def p_write_statement(p):
     '''write_statement : WRITE expression SEMICOLON'''

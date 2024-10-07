@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from lexer.lexer import lexer as custom_lexer
-from parser.parser import parser
+from parser.parser import parser, analyze_semantics
 import re
 
 class IDE(tk.Tk):

@@ -1,5 +1,9 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
+Unused terminals:
+
+    UNTIL
+
 Grammar
 
 Rule 0     S' -> program
@@ -21,7 +25,7 @@ Rule 15    statements -> empty
 Rule 16    statement -> assignment
 Rule 17    statement -> if_statement
 Rule 18    statement -> while_statement
-Rule 19    statement -> do_until_statement
+Rule 19    statement -> do_while_statement
 Rule 20    statement -> write_statement
 Rule 21    statement -> read_statement
 Rule 22    statement -> block
@@ -30,7 +34,7 @@ Rule 24    if_statement -> IF expression THEN statements else_part FI
 Rule 25    else_part -> ELSE statements
 Rule 26    else_part -> empty
 Rule 27    while_statement -> WHILE expression LBRACE statements RBRACE
-Rule 28    do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+Rule 28    do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
 Rule 29    write_statement -> WRITE expression SEMICOLON
 Rule 30    read_statement -> READ IDENTIFIER SEMICOLON
 Rule 31    block -> LBRACE statements RBRACE
@@ -76,7 +80,7 @@ IF                   : 24
 INT                  : 10
 LBRACE               : 1 27 28 31
 LE                   : 40
-LPAREN               : 47
+LPAREN               : 28 47
 LT                   : 38
 MINUS                : 33 45
 NE                   : 42
@@ -88,13 +92,13 @@ POWER                : 36
 PROGRAM              : 1
 RBRACE               : 1 27 28 31
 READ                 : 30
-RPAREN               : 47
+RPAREN               : 28 47
 SEMICOLON            : 5 23 28 29 30
 THEN                 : 24
 TIMES                : 34
 TRUE                 : 50
-UNTIL                : 28
-WHILE                : 27
+UNTIL                : 
+WHILE                : 27 28
 WRITE                : 29
 error                : 
 
@@ -104,7 +108,7 @@ assignment           : 16
 block                : 22
 declaration          : 2 3
 declarations         : 1 2
-do_until_statement   : 19
+do_while_statement   : 19
 else_part            : 24
 empty                : 4 15 26
 expression           : 7 9 23 24 27 28 29 32 32 33 33 34 34 35 35 36 36 37 37 38 38 39 39 40 40 41 41 42 42 43 43 44 44 45 46 47
@@ -189,7 +193,7 @@ state 4
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -200,7 +204,7 @@ state 4
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -240,7 +244,7 @@ state 4
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -321,7 +325,7 @@ state 11
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -329,7 +333,7 @@ state 11
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -364,7 +368,7 @@ state 11
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -376,14 +380,14 @@ state 12
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -401,7 +405,7 @@ state 12
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -505,18 +509,18 @@ state 18
 
 state 19
 
-    (19) statement -> do_until_statement .
+    (19) statement -> do_while_statement .
 
-    RBRACE          reduce using rule 19 (statement -> do_until_statement .)
-    IDENTIFIER      reduce using rule 19 (statement -> do_until_statement .)
-    IF              reduce using rule 19 (statement -> do_until_statement .)
-    WHILE           reduce using rule 19 (statement -> do_until_statement .)
-    DO              reduce using rule 19 (statement -> do_until_statement .)
-    WRITE           reduce using rule 19 (statement -> do_until_statement .)
-    READ            reduce using rule 19 (statement -> do_until_statement .)
-    LBRACE          reduce using rule 19 (statement -> do_until_statement .)
-    ELSE            reduce using rule 19 (statement -> do_until_statement .)
-    FI              reduce using rule 19 (statement -> do_until_statement .)
+    RBRACE          reduce using rule 19 (statement -> do_while_statement .)
+    IDENTIFIER      reduce using rule 19 (statement -> do_while_statement .)
+    IF              reduce using rule 19 (statement -> do_while_statement .)
+    WHILE           reduce using rule 19 (statement -> do_while_statement .)
+    DO              reduce using rule 19 (statement -> do_while_statement .)
+    WRITE           reduce using rule 19 (statement -> do_while_statement .)
+    READ            reduce using rule 19 (statement -> do_while_statement .)
+    LBRACE          reduce using rule 19 (statement -> do_while_statement .)
+    ELSE            reduce using rule 19 (statement -> do_while_statement .)
+    FI              reduce using rule 19 (statement -> do_while_statement .)
 
 
 state 20
@@ -644,7 +648,7 @@ state 25
 
 state 26
 
-    (28) do_until_statement -> DO . LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> DO . LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
 
     LBRACE          shift and go to state 44
 
@@ -717,14 +721,14 @@ state 31
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -742,7 +746,7 @@ state 31
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -1070,14 +1074,14 @@ state 43
 
 state 44
 
-    (28) do_until_statement -> DO LBRACE . statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> DO LBRACE . statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (13) statements -> . statements statement
     (14) statements -> . statement
     (15) statements -> . empty
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -1085,7 +1089,7 @@ state 44
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -1120,7 +1124,7 @@ state 44
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -1282,7 +1286,7 @@ state 52
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -1290,7 +1294,7 @@ state 52
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -1326,7 +1330,7 @@ state 52
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -1917,7 +1921,7 @@ state 69
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -1925,7 +1929,7 @@ state 69
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -1960,26 +1964,26 @@ state 69
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
 
 state 70
 
-    (28) do_until_statement -> DO LBRACE statements . RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> DO LBRACE statements . RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (13) statements -> statements . statement
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -1997,7 +2001,7 @@ state 70
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -2103,7 +2107,7 @@ state 76
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -2111,7 +2115,7 @@ state 76
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -2132,7 +2136,7 @@ state 76
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -2844,14 +2848,14 @@ state 91
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -2869,16 +2873,16 @@ state 91
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
 
 state 92
 
-    (28) do_until_statement -> DO LBRACE statements RBRACE . UNTIL expression SEMICOLON
+    (28) do_while_statement -> DO LBRACE statements RBRACE . WHILE LPAREN expression RPAREN SEMICOLON
 
-    UNTIL           shift and go to state 98
+    WHILE           shift and go to state 98
 
 
 state 93
@@ -2931,7 +2935,7 @@ state 95
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
@@ -2939,7 +2943,7 @@ state 95
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -2974,7 +2978,7 @@ state 95
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
@@ -3004,37 +3008,10 @@ state 97
 
 state 98
 
-    (28) do_until_statement -> DO LBRACE statements RBRACE UNTIL . expression SEMICOLON
-    (32) expression -> . expression PLUS expression
-    (33) expression -> . expression MINUS expression
-    (34) expression -> . expression TIMES expression
-    (35) expression -> . expression DIVIDE expression
-    (36) expression -> . expression POWER expression
-    (37) expression -> . expression EQ expression
-    (38) expression -> . expression LT expression
-    (39) expression -> . expression GT expression
-    (40) expression -> . expression LE expression
-    (41) expression -> . expression GE expression
-    (42) expression -> . expression NE expression
-    (43) expression -> . expression AND expression
-    (44) expression -> . expression OR expression
-    (45) expression -> . MINUS expression
-    (46) expression -> . NOT expression
-    (47) expression -> . LPAREN expression RPAREN
-    (48) expression -> . NUMBER
-    (49) expression -> . IDENTIFIER
-    (50) expression -> . TRUE
-    (51) expression -> . FALSE
+    (28) do_while_statement -> DO LBRACE statements RBRACE WHILE . LPAREN expression RPAREN SEMICOLON
 
-    MINUS           shift and go to state 36
-    NOT             shift and go to state 37
-    LPAREN          shift and go to state 38
-    NUMBER          shift and go to state 39
-    IDENTIFIER      shift and go to state 40
-    TRUE            shift and go to state 41
-    FALSE           shift and go to state 42
+    LPAREN          shift and go to state 102
 
-    expression                     shift and go to state 102
 
 state 99
 
@@ -3093,14 +3070,14 @@ state 101
     (16) statement -> . assignment
     (17) statement -> . if_statement
     (18) statement -> . while_statement
-    (19) statement -> . do_until_statement
+    (19) statement -> . do_while_statement
     (20) statement -> . write_statement
     (21) statement -> . read_statement
     (22) statement -> . block
     (23) assignment -> . IDENTIFIER ASSIGN expression SEMICOLON
     (24) if_statement -> . IF expression THEN statements else_part FI
     (27) while_statement -> . WHILE expression LBRACE statements RBRACE
-    (28) do_until_statement -> . DO LBRACE statements RBRACE UNTIL expression SEMICOLON
+    (28) do_while_statement -> . DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON
     (29) write_statement -> . WRITE expression SEMICOLON
     (30) read_statement -> . READ IDENTIFIER SEMICOLON
     (31) block -> . LBRACE statements RBRACE
@@ -3118,14 +3095,48 @@ state 101
     assignment                     shift and go to state 16
     if_statement                   shift and go to state 17
     while_statement                shift and go to state 18
-    do_until_statement             shift and go to state 19
+    do_while_statement             shift and go to state 19
     write_statement                shift and go to state 20
     read_statement                 shift and go to state 21
     block                          shift and go to state 22
 
 state 102
 
-    (28) do_until_statement -> DO LBRACE statements RBRACE UNTIL expression . SEMICOLON
+    (28) do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN . expression RPAREN SEMICOLON
+    (32) expression -> . expression PLUS expression
+    (33) expression -> . expression MINUS expression
+    (34) expression -> . expression TIMES expression
+    (35) expression -> . expression DIVIDE expression
+    (36) expression -> . expression POWER expression
+    (37) expression -> . expression EQ expression
+    (38) expression -> . expression LT expression
+    (39) expression -> . expression GT expression
+    (40) expression -> . expression LE expression
+    (41) expression -> . expression GE expression
+    (42) expression -> . expression NE expression
+    (43) expression -> . expression AND expression
+    (44) expression -> . expression OR expression
+    (45) expression -> . MINUS expression
+    (46) expression -> . NOT expression
+    (47) expression -> . LPAREN expression RPAREN
+    (48) expression -> . NUMBER
+    (49) expression -> . IDENTIFIER
+    (50) expression -> . TRUE
+    (51) expression -> . FALSE
+
+    MINUS           shift and go to state 36
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 38
+    NUMBER          shift and go to state 39
+    IDENTIFIER      shift and go to state 40
+    TRUE            shift and go to state 41
+    FALSE           shift and go to state 42
+
+    expression                     shift and go to state 103
+
+state 103
+
+    (28) do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression . RPAREN SEMICOLON
     (32) expression -> expression . PLUS expression
     (33) expression -> expression . MINUS expression
     (34) expression -> expression . TIMES expression
@@ -3140,7 +3151,7 @@ state 102
     (43) expression -> expression . AND expression
     (44) expression -> expression . OR expression
 
-    SEMICOLON       shift and go to state 103
+    RPAREN          shift and go to state 104
     PLUS            shift and go to state 53
     MINUS           shift and go to state 54
     TIMES           shift and go to state 55
@@ -3156,20 +3167,27 @@ state 102
     OR              shift and go to state 65
 
 
-state 103
+state 104
 
-    (28) do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .
+    (28) do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN . SEMICOLON
 
-    RBRACE          reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    IDENTIFIER      reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    IF              reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    WHILE           reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    DO              reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    WRITE           reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    READ            reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    LBRACE          reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    ELSE            reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
-    FI              reduce using rule 28 (do_until_statement -> DO LBRACE statements RBRACE UNTIL expression SEMICOLON .)
+    SEMICOLON       shift and go to state 105
+
+
+state 105
+
+    (28) do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .
+
+    RBRACE          reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    IDENTIFIER      reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    IF              reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    WHILE           reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    DO              reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    WRITE           reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    READ            reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    LBRACE          reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    ELSE            reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
+    FI              reduce using rule 28 (do_while_statement -> DO LBRACE statements RBRACE WHILE LPAREN expression RPAREN SEMICOLON .)
 
 WARNING: 
 WARNING: Conflicts:
