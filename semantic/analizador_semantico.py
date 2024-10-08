@@ -19,7 +19,7 @@ class SemanticNodeWithAnnotations(SemanticNode):
         self.annotations[key] = value
 
 # Función de análisis semántico
-def analyze_semantics_with_annotations(ast, symbol_table):
+def analyze_semantics_with_annotations(ast, symbol_table, tokens):
     if isinstance(ast, tuple):
         node_type = ast[0]
         semantic_node = SemanticNodeWithAnnotations(node_type)
@@ -28,27 +28,42 @@ def analyze_semantics_with_annotations(ast, symbol_table):
             if node_type == 'declaration':
                 var_type = ast[1]
                 for var in ast[2]:
+                    # Obtener la línea del token correspondiente
+                    token = next((tok for tok in tokens if tok.value == var), None)
+                    line_number = token.lineno if token else 0
+
                     if isinstance(var, tuple) and var[0] == 'assign':
-                        symbol_table.add_symbol(var[1], {'type': var_type, 'value': None})
-                        semantic_node.add_annotation(var[1], f"{var_type} declared")
+                        if symbol_table.get_symbol(var[1]):
+                            semantic_node.add_annotation(var[1], "Error: Variable already declared")
+                        else:
+                            symbol_table.add_symbol(var[1], {'type': var_type, 'value': None, 'lines': [line_number]})
+                            semantic_node.add_annotation(var[1], f"{var_type} declared on line {line_number}")
                     else:
-                        symbol_table.add_symbol(var, {'type': var_type})
-                        semantic_node.add_annotation(var, f"{var_type} declared")
+                        if symbol_table.get_symbol(var):
+                            semantic_node.add_annotation(var, "Error: Variable already declared")
+                        else:
+                            symbol_table.add_symbol(var, {'type': var_type, 'lines': [line_number]})
+                            semantic_node.add_annotation(var, f"{var_type} declared on line {line_number}")
             
             elif node_type == 'assignment':
                 var_name = ast[1]
+                token = next((tok for tok in tokens if tok.value == var_name), None)
+                line_number = token.lineno if token else 0
+
                 expected_type = symbol_table.get_symbol(var_name).get('type', 'unknown')
                 expression_value = evaluate_expression(ast[2], symbol_table, expected_type)
                 
-                # Actualizar la tabla de símbolos con el valor final
-                symbol_table.update_symbol(var_name, {'type': expected_type, 'value': expression_value})
-                semantic_node.add_annotation(var_name, f"assigned value {expression_value}")
+                # Actualizar la tabla de símbolos con el valor final y agregar la línea
+                if symbol_table.get_symbol(var_name):
+                    symbol_table.get_symbol(var_name)['lines'].append(line_number)
+                symbol_table.update_symbol(var_name, {'type': expected_type, 'value': expression_value, 'lines': symbol_table.get_symbol(var_name)['lines']})
+                semantic_node.add_annotation(var_name, f"assigned value {expression_value} on line {line_number}")
         except Exception as e:
             semantic_node.add_annotation("error", f"Semantic Error: {str(e)}")
 
         # Procesar recursivamente las otras partes del árbol
         for child in ast[1:]:
-            semantic_child = analyze_semantics_with_annotations(child, symbol_table)
+            semantic_child = analyze_semantics_with_annotations(child, symbol_table, tokens)
             semantic_node.add_child(semantic_child)
         
         return semantic_node
@@ -56,7 +71,7 @@ def analyze_semantics_with_annotations(ast, symbol_table):
     elif isinstance(ast, list):
         semantic_node = SemanticNodeWithAnnotations("block")
         for node in ast:
-            semantic_child = analyze_semantics_with_annotations(node, symbol_table)
+            semantic_child = analyze_semantics_with_annotations(node, symbol_table, tokens)
             semantic_node.add_child(semantic_child)
         return semantic_node
     
@@ -68,6 +83,8 @@ def analyze_semantics_with_annotations(ast, symbol_table):
 
     else:
         return SemanticNodeWithAnnotations("literal", ast)
+
+
 
 
 

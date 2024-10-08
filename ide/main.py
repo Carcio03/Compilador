@@ -102,12 +102,18 @@ class IDE(tk.Tk):
 
         # Pestaña para la Tabla de Símbolos
         symbol_table_frame = tk.Frame(notebook, bg='#2b2b2b')
-        self.symbol_table = ttk.Treeview(symbol_table_frame, columns=("name", "type", "value"), show='headings', style="Treeview")
+        self.symbol_table = ttk.Treeview(symbol_table_frame, columns=("name", "type", "value", "lines"), show='headings', style="Treeview")
         self.symbol_table.heading("name", text="Name")
         self.symbol_table.heading("type", text="Type")
         self.symbol_table.heading("value", text="Value")
+        self.symbol_table.heading("lines", text="Lines")  # Nueva columna para las líneas
+        self.symbol_table.column("name", width=100)  # Ajusta el ancho de la columna según sea necesario
+        self.symbol_table.column("type", width=100)
+        self.symbol_table.column("value", width=100)
+        self.symbol_table.column("lines", width=100)  # Ajusta el ancho de la columna para las líneas
         self.symbol_table.pack(expand=1, fill='both')
         notebook.add(symbol_table_frame, text="Tabla de Símbolos")
+
 
         # Empacar las pestañas
         notebook.pack(expand=1, fill='both')
@@ -226,16 +232,18 @@ class IDE(tk.Tk):
         # Realizar análisis semántico
         symbol_table = SymbolTable()
         try:
-            annotated_tree = analyze_semantics_with_annotations(result, symbol_table)
+            tokens = [tok for tok in custom_lexer]
+            annotated_tree = analyze_semantics_with_annotations(result, symbol_table, tokens)
             self.populate_symbol_table(symbol_table)
             self.display_semantic_tree_with_annotations(annotated_tree)
         except Exception as e:
             self.error_area.config(state='normal')
             self.error_area.insert(tk.END, f"Semantic Error: {str(e)}\n")
             self.error_area.config(state='disabled')
-            
-        # Incluso si hay errores semánticos, debemos seguir mostrando el árbol semántico
+
+        # Asegurarse de que el árbol semántico se genere incluso si hay errores
         self.display_semantic_tree_with_annotations(result)
+
 
     def display_parser_tree(self, root_node):
         def add_nodes_to_tree(tree, node, parent=""):
@@ -294,7 +302,10 @@ class IDE(tk.Tk):
             # Limitar los floats a 4 caracteres
             if isinstance(value, float):
                 value = f"{value:.4f}"
-            self.symbol_table.insert("", "end", values=(name, info['type'], value))
+            # Convertir las líneas en un string para mostrar
+            lines = ', '.join(map(str, info['lines']))
+            self.symbol_table.insert("", "end", values=(name, info['type'], value, lines))
+
 
     def on_modified(self, event=None):
         self.highlight_reserved_words()
