@@ -36,12 +36,14 @@ def analyze_semantics_with_annotations(ast, symbol_table):
         
         elif node_type == 'assignment':
             var_name = ast[1]
-            expected_type = symbol_table.get_symbol(var_name).get('type', 'unknown')
-            expression_value = evaluate_expression(ast[2], symbol_table, expected_type)
-            
-            # Actualizar la tabla de símbolos con el valor final
-            symbol_table.update_symbol(var_name, {'type': expected_type, 'value': expression_value})
-            semantic_node.add_annotation(var_name, f"assigned value {expression_value}")
+            symbol_info = symbol_table.get_symbol(var_name)
+            if symbol_info:
+                expected_type = symbol_info.get('type', 'unknown')
+                expression_value = evaluate_expression(ast[2], symbol_table, expected_type)
+                symbol_table.update_symbol(var_name, {'type': expected_type, 'value': expression_value})
+                semantic_node.add_annotation(var_name, f"assigned value {expression_value}")
+            else:
+                semantic_node.add_annotation(var_name, f"Error: '{var_name}' not declared")
         
         # Procesar recursivamente las otras partes del árbol
         for child in ast[1:]:
@@ -67,6 +69,7 @@ def analyze_semantics_with_annotations(ast, symbol_table):
 
     else:
         return SemanticNodeWithAnnotations("literal", ast)
+
 
 def evaluate_expression(expr, symbol_table, expected_type=None):
     """Evalúa una expresión y devuelve el resultado."""
@@ -98,7 +101,8 @@ def evaluate_expression(expr, symbol_table, expected_type=None):
             if symbol_info and 'value' in symbol_info:
                 return symbol_info['value']
             else:
-                raise ValueError(f"Unknown identifier '{var_name}'")
+                print(f"Error: '{var_name}' not declared")
+                return f"Error: '{var_name}' not declared"
         
         # Caso de un número literal (como ('number', 45))
         elif len(expr) == 2 and expr[0] == 'number':
@@ -126,7 +130,9 @@ def evaluate_expression(expr, symbol_table, expected_type=None):
         if symbol_info and 'value' in symbol_info:
             return symbol_info['value']
         else:
-            raise ValueError(f"Unknown identifier '{expr}'")
+            print(f"Error: '{expr}' not declared")
+            return f"Error: '{expr}' not declared"
+
 
 
 

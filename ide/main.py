@@ -252,7 +252,10 @@ class IDE(tk.Tk):
     def populate_symbol_table(self, symbol_table):
         # Llenar la tabla de símbolos en la pestaña correspondiente
         for name, info in symbol_table.symbols.items():
-            self.symbol_table.insert("", "end", values=(name, info['type'], info.get('value', '')))
+            value = info.get('value', '')
+            if isinstance(value, float):
+                value = format(value, ".4f")  # Redondear a 4 decimales
+            self.symbol_table.insert("", "end", values=(name, info['type'], value))
 
     def on_modified(self, event=None):
         self.highlight_reserved_words()
