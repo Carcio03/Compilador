@@ -1,17 +1,4 @@
 import ply.yacc as yacc
-from parser.semantics import SemanticAnalyzer
-
-# Dentro de la función donde se maneja el AST tras el parseo exitoso
-semantic_analyzer = SemanticAnalyzer()
-
-# Analizar el AST generado por el parser
-def analyze_semantics(ast):
-    try:
-        semantic_analyzer.analyze(ast)
-        return "Análisis semántico exitoso"
-    except Exception as e:
-        return str(e)
-
 
 # Definir los tokens
 tokens = (
@@ -210,11 +197,13 @@ def p_empty(p):
 
 def p_error(p):
     if p:
-        parser.errors.append(f"Syntax error at '{p.value}', line {p.lineno}")
-        # Saltar el token problemático y continuar
-        p.lexer.skip(1)
+        error_message = f"Syntax error at '{p.value}', line {p.lineno}"
+        parser.errors.append(error_message)
+        # En lugar de detenernos, retornamos un nodo de error en el árbol
+        return ('error', f"Error at '{p.value}' on line {p.lineno}")
     else:
         parser.errors.append("Syntax error at EOF")
+        return ('error', "Error at EOF")
 
 parser = yacc.yacc()
 parser.errors = []
