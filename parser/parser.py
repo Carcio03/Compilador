@@ -119,11 +119,13 @@ def p_assignment(p):
     p[0] = ('assignment', p[1], p[3])
 
 def p_if_statement(p):
-    '''if_statement : IF expression THEN statements else_part FI'''
-    p[0] = ('if', p[2], p[4], p[5])
+    '''if_statement : IF expression block else_part FI
+                    | IF expression statement else_part FI'''
+    p[0] = ('if', p[2], p[3], p[4])
 
 def p_else_part(p):
-    '''else_part : ELSE statements
+    '''else_part : ELSE block
+                 | ELSE statement
                  | empty'''
     if len(p) == 3:
         p[0] = p[2]
@@ -199,10 +201,11 @@ def p_error(p):
     if p:
         error_message = f"Syntax error at '{p.value}', line {p.lineno}"
         parser.errors.append(error_message)
-        # En lugar de detenernos, retornamos un nodo de error en el árbol
+        print(error_message)  # Agregar esta línea para depuración en tiempo real
         return ('error', f"Error at '{p.value}' on line {p.lineno}")
     else:
         parser.errors.append("Syntax error at EOF")
+        print("Syntax error at EOF")  # Depuración en tiempo real
         return ('error', "Error at EOF")
 
 parser = yacc.yacc()

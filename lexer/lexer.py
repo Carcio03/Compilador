@@ -98,9 +98,14 @@ def t_NUMBER(t):
 # Ignorar espacios en blanco y tabulaciones
 t_ignore = ' \t'
 
-# Ignorar comentarios
-def t_comment(t):
-    r'(/\*(.|\n)*?\*/)|(//.*)'
+# Ignorar comentarios de bloque
+def t_block_comment(t):
+    r'/\*(.|\n)*?\*/'
+    pass
+
+# Ignorar comentarios de línea
+def t_line_comment(t):
+    r'//.*'
     pass
 
 # Manejo de nuevas líneas

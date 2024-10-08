@@ -9,7 +9,7 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from lexer.lexer import lexer as custom_lexer
 from parser.parser import parser
-from semantic.analizador_semantico import analyze_semantics_with_annotations, SymbolTable
+from semantic.analizador_semantico import analyze_semantics_with_annotations, SymbolTable, SemanticNodeWithAnnotations
 import re
 
 class IDE(tk.Tk):
@@ -195,22 +195,32 @@ class IDE(tk.Tk):
 
         # Parsear el código fuente y manejar errores
         parser.errors.clear()
+        result = None
         try:
             result = parser.parse(source_code)
-            self.display_parser_tree(result)
-            # Realizar análisis semántico
-            self.generate_semantic_analysis(result)
         except Exception as e:
             self.error_area.config(state='normal')
             self.error_area.insert(tk.END, f"Parser Error: {e}\n")
             self.error_area.config(state='disabled')
 
-        # Mostrar errores sintácticos en el área de errores
+        # Si hubo errores sintácticos, mostrar pero seguir generando el árbol
         if parser.errors:
             self.error_area.config(state='normal')
             for error in parser.errors:
                 self.error_area.insert(tk.END, f"Parser Error: {error}\n")
             self.error_area.config(state='disabled')
+
+        # Generar el árbol gramatical, incluso si hubo errores
+        if result:
+            self.display_parser_tree(result)
+        else:
+            # Si no se pudo generar el árbol completo debido a errores, generar un árbol parcial con los errores
+            result = ('error', 'Parser Error', parser.errors)
+            self.display_parser_tree(result)
+
+        # Realizar análisis semántico y seguir si hay errores
+        if result:
+            self.generate_semantic_analysis(result)
 
     def generate_semantic_analysis(self, result):
         # Realizar análisis semántico
@@ -223,6 +233,9 @@ class IDE(tk.Tk):
             self.error_area.config(state='normal')
             self.error_area.insert(tk.END, f"Semantic Error: {str(e)}\n")
             self.error_area.config(state='disabled')
+            
+        # Incluso si hay errores semánticos, debemos seguir mostrando el árbol semántico
+        self.display_semantic_tree_with_annotations(result)
 
     def display_parser_tree(self, root_node):
         def add_nodes_to_tree(tree, node, parent=""):
@@ -242,19 +255,45 @@ class IDE(tk.Tk):
 
     def display_semantic_tree_with_annotations(self, root_node):
         def add_nodes_to_tree(tree, node, parent=""):
-            annotations = ", ".join(f"{k}: {v}" for k, v in node.annotations.items())
-            node_id = tree.insert(parent, "end", text=f"{node.node_type} ({annotations})", open=True)
-            for child in node.children:
-                add_nodes_to_tree(tree, child, node_id)
+            # Verifica si es una tupla, en cuyo caso la procesamos como nodo básico
+            if isinstance(node, tuple):
+                node_text = str(node[0])  # El primer elemento es el tipo de nodo
+                node_id = tree.insert(parent, "end", text=node_text, open=True)
+                
+                # Recorremos los hijos de la tupla
+                for child in node[1:]:
+                    add_nodes_to_tree(tree, child, node_id)
 
+            elif isinstance(node, SemanticNodeWithAnnotations):
+                # Verifica si el nodo tiene anotaciones válidas
+                if hasattr(node, 'annotations') and isinstance(node.annotations, dict):
+                    annotations = ", ".join(f"{k}: {v}" for k, v in node.annotations.items())
+                else:
+                    annotations = "No annotations"
+
+                # Agregar el nodo con anotaciones
+                node_id = tree.insert(parent, "end", text=f"{node.node_type} ({annotations})", open=True)
+
+                # Recursivamente agregar los hijos
+                for child in node.children:
+                    add_nodes_to_tree(tree, child, node_id)
+
+            else:
+                # Si el nodo es de otro tipo (como literal o identificador), lo procesamos de forma simple
+                node_id = tree.insert(parent, "end", text=str(node), open=True)
+
+        # Llamar a la función de forma recursiva para el nodo raíz
         add_nodes_to_tree(self.semantic_tree, root_node)
+
+
     
     def populate_symbol_table(self, symbol_table):
         # Llenar la tabla de símbolos en la pestaña correspondiente
         for name, info in symbol_table.symbols.items():
             value = info.get('value', '')
+            # Limitar los floats a 4 caracteres
             if isinstance(value, float):
-                value = format(value, ".4f")  # Redondear a 4 decimales
+                value = f"{value:.4f}"
             self.symbol_table.insert("", "end", values=(name, info['type'], value))
 
     def on_modified(self, event=None):
