@@ -9,7 +9,7 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from lexer.lexer import lexer as custom_lexer
 from parser.parser import parser
-from semantic.analizador_semantico import SymbolTable, analyze_semantics
+from semantic.analizador_semantico import analyze_semantics_with_annotations, SymbolTable
 import re
 
 class IDE(tk.Tk):
@@ -88,18 +88,17 @@ class IDE(tk.Tk):
         self.token_table.pack(expand=1, fill='both')
         notebook.add(token_frame, text="Tokens")
 
-        # Pestaña para la salida del Parser (árbol gramatical)
+        # Pestaña para la salida del Parser (árbol gramatical) usando Treeview
         parser_output_frame = tk.Frame(notebook, bg='#2b2b2b')
-        self.parser_output_area = tk.Text(parser_output_frame, bg='#1e1e1e', fg='#00ff00', state='disabled', font=('Consolas', 12), relief='flat')
-        self.parser_output_area.pack(expand=1, fill='both', padx=5, pady=5)
+        self.parser_tree = ttk.Treeview(parser_output_frame)
+        self.parser_tree.pack(expand=1, fill='both', padx=5, pady=5)
         notebook.add(parser_output_frame, text="Árbol Gramatical")
 
-        # Pestaña para la salida Semántica
+        # Pestaña para la salida Semántica usando Treeview
         semantic_tree_frame = tk.Frame(notebook, bg='#2b2b2b')
-        self.semantic_tree_area = tk.Text(semantic_tree_frame, bg='#1e1e1e', fg='#00ff00', state='disabled', font=('Consolas', 12), relief='flat')
-        self.semantic_tree_area.pack(expand=1, fill='both', padx=5, pady=5)
+        self.semantic_tree = ttk.Treeview(semantic_tree_frame)
+        self.semantic_tree.pack(expand=1, fill='both', padx=5, pady=5)
         notebook.add(semantic_tree_frame, text="Árbol Semántico")
-
 
         # Pestaña para la Tabla de Símbolos
         symbol_table_frame = tk.Frame(notebook, bg='#2b2b2b')
@@ -169,16 +168,11 @@ class IDE(tk.Tk):
         self.error_area.config(state='normal')
         self.error_area.delete('1.0', tk.END)
         self.error_area.config(state='disabled')
-        self.clear_output_areas()
 
         # Limpiar la tabla de tokens
         self.token_table.delete(*self.token_table.get_children())
-        self.parser_output_area.config(state='normal')
-        self.parser_output_area.delete('1.0', tk.END)
-        self.parser_output_area.config(state='disabled')
-        self.semantic_output_area.config(state='normal')
-        self.semantic_output_area.delete('1.0', tk.END)
-        self.semantic_output_area.config(state='disabled')
+        self.parser_tree.delete(*self.parser_tree.get_children())
+        self.semantic_tree.delete(*self.semantic_tree.get_children())
         self.symbol_table.delete(*self.symbol_table.get_children())
 
         # Obtener el contenido del editor de texto
@@ -203,36 +197,26 @@ class IDE(tk.Tk):
         parser.errors.clear()
         try:
             result = parser.parse(source_code)
-            self.display_parser_output(result)
-             # Realizar análisis semántico
+            self.display_parser_tree(result)
+            # Realizar análisis semántico
             self.generate_semantic_analysis(result)
         except Exception as e:
             self.error_area.config(state='normal')
             self.error_area.insert(tk.END, f"Parser Error: {e}\n")
             self.error_area.config(state='disabled')
-            # try:
-            #     analyze_semantics(result, symbol_table)
-            #     self.populate_symbol_table(symbol_table)
-            #     self.display_semantic_tree(result)
-            # except Exception as e:
-            #     self.error_area.config(state='normal')
-            #     self.error_area.insert(tk.END, f"Semantic Error: {str(e)}\n")
-            #     self.error_area.config(state='disabled')
-            
+
         # Mostrar errores sintácticos en el área de errores
         if parser.errors:
             self.error_area.config(state='normal')
             for error in parser.errors:
                 self.error_area.insert(tk.END, f"Parser Error: {error}\n")
             self.error_area.config(state='disabled')
-        
-        self.display_semantic_tree(result)
 
     def generate_semantic_analysis(self, result):
-    # Realizar análisis semántico
+        # Realizar análisis semántico
         symbol_table = SymbolTable()
         try:
-            annotated_tree = self.analyze_semantics_with_annotations(result, symbol_table)
+            annotated_tree = analyze_semantics_with_annotations(result, symbol_table)
             self.populate_symbol_table(symbol_table)
             self.display_semantic_tree_with_annotations(annotated_tree)
         except Exception as e:
@@ -240,54 +224,35 @@ class IDE(tk.Tk):
             self.error_area.insert(tk.END, f"Semantic Error: {str(e)}\n")
             self.error_area.config(state='disabled')
 
-    def display_semantic_tree_with_annotations(self, root_node):
-        def format_node(node, indent=0):
-            output = "  " * indent + str(node.node_type) + " (" + ", ".join(f"{k}: {v}" for k, v in node.annotations.items()) + ")\n"
-            for child in node.children:
-                output += format_node(child, indent + 1)
-            return output
+    def display_parser_tree(self, root_node):
+        def add_nodes_to_tree(tree, node, parent=""):
+            if isinstance(node, tuple):
+                node_id = tree.insert(parent, "end", text=str(node[0]), open=True)
+                for child in node[1:]:
+                    add_nodes_to_tree(tree, child, node_id)
+            elif isinstance(node, list):
+                for item in node:
+                    add_nodes_to_tree(tree, item, parent)
+            else:
+                tree.insert(parent, "end", text=str(node))
 
-        formatted_tree = format_node(root_node)
-        self.semantic_tree_area.config(state='normal')
-        self.semantic_tree_area.insert(tk.END, formatted_tree)
-        self.semantic_tree_area.config(state='disabled')
+        # Limpiar el árbol antes de añadir nodos
+        self.parser_tree.delete(*self.parser_tree.get_children())
+        add_nodes_to_tree(self.parser_tree, root_node)
+
+    def display_semantic_tree_with_annotations(self, root_node):
+        def add_nodes_to_tree(tree, node, parent=""):
+            annotations = ", ".join(f"{k}: {v}" for k, v in node.annotations.items())
+            node_id = tree.insert(parent, "end", text=f"{node.node_type} ({annotations})", open=True)
+            for child in node.children:
+                add_nodes_to_tree(tree, child, node_id)
+
+        add_nodes_to_tree(self.semantic_tree, root_node)
     
     def populate_symbol_table(self, symbol_table):
         # Llenar la tabla de símbolos en la pestaña correspondiente
         for name, info in symbol_table.symbols.items():
             self.symbol_table.insert("", "end", values=(name, info['type'], info.get('value', '')))
-
-    def display_semantic_tree(self, root_node):
-        def format_node(node, indent=0):
-            output = "  " * indent + str(node) + "\n"
-            for child in node.children:
-                output += format_node(child, indent + 1)
-            return output
-
-        formatted_tree = format_node(root_node)
-        self.semantic_output_area.config(state='normal')
-        self.semantic_output_area.insert(tk.END, formatted_tree)
-        self.semantic_output_area.config(state='disabled')
-
-    def display_parser_output(self, result):
-        def format_result(node, indent=0):
-            if isinstance(node, tuple):
-                output = "  " * indent + str(node[0]) + "\n"
-                for child in node[1:]:
-                    output += format_result(child, indent + 1)
-                return output
-            elif isinstance(node, list):
-                output = ""
-                for item in node:
-                    output += format_result(item, indent)
-                return output
-            else:
-                return "  " * indent + str(node) + "\n"
-
-        formatted_result = format_result(result)
-        self.parser_output_area.config(state='normal')
-        self.parser_output_area.insert(tk.END, formatted_result)
-        self.parser_output_area.config(state='disabled')
 
     def on_modified(self, event=None):
         self.highlight_reserved_words()
