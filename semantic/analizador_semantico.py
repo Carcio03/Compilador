@@ -1,4 +1,4 @@
-class SemanticNode:
+class SemanticNode: 
     def __init__(self, node_type, value=None):
         self.node_type = node_type
         self.value = value
@@ -24,44 +24,33 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens):
         node_type = ast[0]
         semantic_node = SemanticNodeWithAnnotations(node_type)
         
-        try:
-            if node_type == 'declaration':
-                var_type = ast[1]
-                for var in ast[2]:
-                    # Obtener la línea del token correspondiente
-                    token = next((tok for tok in tokens if tok.value == var), None)
-                    line_number = token.lineno if token else 0
-
-                    if isinstance(var, tuple) and var[0] == 'assign':
-                        if symbol_table.get_symbol(var[1]):
-                            semantic_node.add_annotation(var[1], "Error: Variable already declared")
-                        else:
-                            symbol_table.add_symbol(var[1], {'type': var_type, 'value': None, 'lines': [line_number]})
-                            semantic_node.add_annotation(var[1], f"{var_type} declared on line {line_number}")
-                    else:
-                        if symbol_table.get_symbol(var):
-                            semantic_node.add_annotation(var, "Error: Variable already declared")
-                        else:
-                            symbol_table.add_symbol(var, {'type': var_type, 'lines': [line_number]})
-                            semantic_node.add_annotation(var, f"{var_type} declared on line {line_number}")
+        if node_type == 'binop':
+            # Obtener los valores de los operandos
+            left_value = evaluate_expression(ast[2], symbol_table)
+            right_value = evaluate_expression(ast[3], symbol_table)
             
-            elif node_type == 'assignment':
-                var_name = ast[1]
-                token = next((tok for tok in tokens if tok.value == var_name), None)
-                line_number = token.lineno if token else 0
+            # Realizar la operación y agregar el resultado al nodo
+            if ast[1] == '+':
+                result = left_value + right_value
+            elif ast[1] == '-':
+                result = left_value - right_value
+            elif ast[1] == '*':
+                result = left_value * right_value
+            elif ast[1] == '/':
+                result = left_value / right_value
+            else:
+                result = None
 
-                expected_type = symbol_table.get_symbol(var_name).get('type', 'unknown')
-                expression_value = evaluate_expression(ast[2], symbol_table, expected_type)
-                
-                # Actualizar la tabla de símbolos con el valor final y agregar la línea
-                if symbol_table.get_symbol(var_name):
-                    symbol_table.get_symbol(var_name)['lines'].append(line_number)
-                symbol_table.update_symbol(var_name, {'type': expected_type, 'value': expression_value, 'lines': symbol_table.get_symbol(var_name)['lines']})
-                semantic_node.add_annotation(var_name, f"assigned value {expression_value} on line {line_number}")
-        except Exception as e:
-            semantic_node.add_annotation("error", f"Semantic Error: {str(e)}")
-
-        # Procesar recursivamente las otras partes del árbol
+            # Añadir una anotación con el resultado
+            semantic_node.add_annotation("result", f"{left_value} {ast[1]} {right_value} = {result}")
+            
+            # Agregar los hijos (operandos) al nodo
+            semantic_node.add_child(analyze_semantics_with_annotations(ast[2], symbol_table, tokens))
+            semantic_node.add_child(analyze_semantics_with_annotations(ast[3], symbol_table, tokens))
+            
+            return semantic_node
+        
+        # Procesar el resto de nodos recursivamente
         for child in ast[1:]:
             semantic_child = analyze_semantics_with_annotations(child, symbol_table, tokens)
             semantic_node.add_child(semantic_child)
@@ -74,58 +63,86 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens):
             semantic_child = analyze_semantics_with_annotations(node, symbol_table, tokens)
             semantic_node.add_child(semantic_child)
         return semantic_node
-    
+
+    # Literales numéricos
     elif isinstance(ast, (int, float)):
-        return SemanticNodeWithAnnotations(f"number ({ast})", ast)
+        node = SemanticNodeWithAnnotations(f"number ({ast})", ast)
+        node.add_annotation("type", "int" if isinstance(ast, int) else "float")
+        node.add_annotation("value", ast)
+        return node
 
+    # Identificadores
     elif isinstance(ast, str):
-        return SemanticNodeWithAnnotations(f"identifier ({ast})", ast)
+        symbol_info = symbol_table.get_symbol(ast)
+        if symbol_info:
+            value = symbol_info.get('value', 'undefined')
+            node = SemanticNodeWithAnnotations(f"identifier ({ast})", value)
+            node.add_annotation("type", symbol_info['type'])
+            node.add_annotation("value", value)
+        else:
+            node = SemanticNodeWithAnnotations(f"identifier ({ast})", "undefined")
+        return node
 
-    else:
-        return SemanticNodeWithAnnotations("literal", ast)
-
+    return SemanticNodeWithAnnotations("literal", ast)
 
 
 
 
 def evaluate_expression(expr, symbol_table, expected_type=None):
-    # Función de evaluación de expresiones simplificada
     if isinstance(expr, tuple) and expr[0] == 'binop':
         op = expr[1]
-        left = evaluate_expression(expr[2], symbol_table, expected_type)
-        right = evaluate_expression(expr[3], symbol_table, expected_type)
+        left_value = evaluate_expression(expr[2], symbol_table, expected_type)
+        right_value = evaluate_expression(expr[3], symbol_table, expected_type)
+        
+        # Asegurarse de que los valores no sean None
+        if left_value is None:
+            left_value = 0  # Valor por defecto para None
+        if right_value is None:
+            right_value = 0  # Valor por defecto para None
+        
+        # Realizar la operación y calcular el resultado
         if op == '+':
-            return left + right
+            result = left_value + right_value
         elif op == '-':
-            return left - right
+            result = left_value - right_value
         elif op == '*':
-            return left * right
+            result = left_value * right_value
         elif op == '/':
-            return left / right
+            result = left_value / right_value
         else:
-            raise ValueError(f"Unknown operator {op}")
+            result = None
+        
+        return result
 
     elif isinstance(expr, tuple) and expr[0] == 'number':
         return expr[1]
 
     elif isinstance(expr, tuple) and expr[0] == 'identifier':
         symbol_info = symbol_table.get_symbol(expr[1])
-        if symbol_info and 'value' in symbol_info:
-            return symbol_info['value']
+        if symbol_info:
+            return symbol_info.get('value', 0)  # Valor por defecto si no está definido
         else:
-            return 0
+            return 0  # Valor predeterminado si no existe la variable
 
     return expr
+
+
 
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
 
     def add_symbol(self, name, symbol_info):
+        # Asegurarnos de que siempre exista la clave 'lines'
+        if 'lines' not in symbol_info:
+            symbol_info['lines'] = []
         self.symbols[name] = symbol_info
 
     def get_symbol(self, name):
         return self.symbols.get(name, None)
 
     def update_symbol(self, name, symbol_info):
+        # Asegurarnos de que siempre exista la clave 'lines'
+        if 'lines' not in symbol_info:
+            symbol_info['lines'] = []
         self.symbols[name] = symbol_info
