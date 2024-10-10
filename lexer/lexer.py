@@ -84,15 +84,28 @@ reserved = {
     'false': 'FALSE'
 }
 
-# Identificadores y números
-def t_IDENTIFIER(t):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'IDENTIFIER')
+# Definir token para 'true'
+def t_TRUE(t):
+    r'true'
+    t.value = True  # Asignar el valor booleano True
     return t
 
+# Definir token para 'false'
+def t_FALSE(t):
+    r'false'
+    t.value = False  # Asignar el valor booleano False
+    return t
+
+# Definición de token para los números
 def t_NUMBER(t):
     r'\d+(\.\d+)?'
     t.value = float(t.value) if '.' in t.value else int(t.value)
+    return t
+
+# Definición de token para identificadores
+def t_IDENTIFIER(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'IDENTIFIER')  # Verificar si es una palabra reservada
     return t
 
 # Ignorar espacios en blanco y tabulaciones

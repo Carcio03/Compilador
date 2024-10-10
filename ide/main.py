@@ -48,12 +48,12 @@ class IDE(tk.Tk):
         # Crear el frame principal con dos filas
         main_frame = tk.Frame(self, bg='#2b2b2b')
         main_frame.pack(expand=1, fill='both')
-        main_frame.grid_rowconfigure(0, weight=4)  # Editor y panel
+        main_frame.grid_rowconfigure(0, weight=4)  # Ajuste del editor y el panel
         main_frame.grid_rowconfigure(1, weight=1)  # Área de errores
-        main_frame.grid_columnconfigure(0, weight=2)  # Editor de texto
-        main_frame.grid_columnconfigure(1, weight=3)  # Pestañas (Tokens, Parser, etc.)
+        main_frame.grid_columnconfigure(0, weight=1)  # Ajustar el editor de texto
+        main_frame.grid_columnconfigure(1, weight=2)  # Ajustar el área de pestañas (más grande)
 
-        # Crear el editor de texto en la primera fila y primera columna
+        # Crear el editor de texto en la primera fila y primera columna (peso 1)
         text_frame = tk.Frame(main_frame, padx=10, pady=10, bg='#2b2b2b')
         text_frame.grid(row=0, column=0, sticky='nsew')
 
@@ -62,13 +62,13 @@ class IDE(tk.Tk):
         self.line_numbers.pack(side='left', fill='y')
 
         self.text_area = tk.Text(text_frame, wrap='word', bg='#1e1e1e', fg='#ffffff', insertbackground='white',
-                                 font=('Consolas', 12), relief='flat')
+                                font=('Consolas', 12), relief='flat')
         self.text_area.pack(expand=1, fill='both', padx=5, pady=5)
 
         self.text_area.bind('<KeyRelease>', self.update_line_numbers)
-        self.text_area.bind('<MouseWheel>', self.update_line_numbers)  # Actualizar al desplazarse con el ratón
+        self.text_area.bind('<MouseWheel>', self.update_line_numbers)
 
-        # Crear el panel de pestañas en la primera fila y segunda columna
+        # Crear el panel de pestañas en la primera fila y segunda columna (peso 2)
         notebook_frame = tk.Frame(main_frame, bg='#2b2b2b')
         notebook_frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
 
@@ -106,14 +106,13 @@ class IDE(tk.Tk):
         self.symbol_table.heading("name", text="Name")
         self.symbol_table.heading("type", text="Type")
         self.symbol_table.heading("value", text="Value")
-        self.symbol_table.heading("lines", text="Lines")  # Nueva columna para las líneas
-        self.symbol_table.column("name", width=100)  # Ajusta el ancho de la columna según sea necesario
+        self.symbol_table.heading("lines", text="Lines")
+        self.symbol_table.column("name", width=100)
         self.symbol_table.column("type", width=100)
         self.symbol_table.column("value", width=100)
-        self.symbol_table.column("lines", width=100)  # Ajusta el ancho de la columna para las líneas
+        self.symbol_table.column("lines", width=100)
         self.symbol_table.pack(expand=1, fill='both')
         notebook.add(symbol_table_frame, text="Tabla de Símbolos")
-
 
         # Empacar las pestañas
         notebook.pack(expand=1, fill='both')
@@ -229,13 +228,19 @@ class IDE(tk.Tk):
             self.generate_semantic_analysis(result)
 
     def generate_semantic_analysis(self, result):
+        # Crear una lista para almacenar los errores
+        error_list = []
+        
         # Realizar análisis semántico
         symbol_table = SymbolTable()
         try:
             tokens = [tok for tok in custom_lexer]
-            annotated_tree = analyze_semantics_with_annotations(result, symbol_table, tokens)
+            annotated_tree = analyze_semantics_with_annotations(result, symbol_table, tokens, error_list)
             self.populate_symbol_table(symbol_table)
             self.display_semantic_tree_with_annotations(annotated_tree)
+            
+            # Mostrar los errores acumulados en el área de errores
+            self.display_errors(error_list)
         except Exception as e:
             self.error_area.config(state='normal')
             self.error_area.insert(tk.END, f"Semantic Error: {str(e)}\n")
@@ -243,6 +248,15 @@ class IDE(tk.Tk):
 
         # Asegurarse de que el árbol semántico se genere incluso si hay errores
         self.display_semantic_tree_with_annotations(result)
+
+    def display_errors(self, error_list):
+        # Mostrar los errores en el área de errores
+        if error_list:
+            self.error_area.config(state='normal')
+            for error in error_list:
+                self.error_area.insert(tk.END, f"{error}\n")
+            self.error_area.config(state='disabled')
+
 
 
     def display_parser_tree(self, root_node):
