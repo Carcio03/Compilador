@@ -2,6 +2,8 @@ import ply.yacc as yacc
 
 # Definir la precedencia de los operadores
 precedence = (
+    ('left', 'PLUS', 'MINUS'),  # Addition and subtraction have left associativity
+    ('left', 'TIMES', 'DIVIDE'), 
     ('left', 'OR'),
     ('left', 'AND'),
     ('left', 'EQ', 'NE'),

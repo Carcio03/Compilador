@@ -1,3 +1,6 @@
+
+from lexer.lexer import lexer as custom_lexer
+
 class SemanticNode:
     def __init__(self, node_type, value=None):
         self.node_type = node_type
@@ -31,6 +34,7 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
         if node_type == 'declaration':
             var_type = ast[1]
             var_list = ast[2]
+            
             semantic_node.add_annotation("type", var_type)
             semantic_node.add_annotation("value", "undefined")
 
@@ -148,6 +152,7 @@ def evaluate_expression(expr, symbol_table, error_list=None):
     # Verificamos si es un binop (operación binaria)
     if isinstance(expr, tuple) and expr[0] == 'binop':
         op = expr[1]
+        print(expr)
         # Evaluamos primero el operando izquierdo, y luego el derecho
         left_value = evaluate_expression(expr[2], symbol_table, error_list=error_list)
         right_value = evaluate_expression(expr[3], symbol_table, error_list=error_list)
@@ -179,9 +184,37 @@ def evaluate_expression(expr, symbol_table, error_list=None):
 
             # Evaluar operadores lógicos
             elif op == 'and':
+                if left_value == 1:
+                    left_value = True
+                elif left_value == 0:
+                    left_value = False
+                
+                if right_value == 1:
+                    right_value = True
+                elif right_value == 0:
+                    right_value = False
+                
                 result = left_value and right_value
             elif op == 'or':
+                if left_value == 1:
+                    left_value = True
+                elif left_value == 0:
+                    left_value = False
+                
+                if right_value == 1:
+                    right_value = True
+                elif right_value == 0:
+                    right_value = False
                 result = left_value or right_value
+
+            #if expr[2][4] == "int" and expr[3][4] == "int":
+            #    result = int(result)
+            #    expr[4] = "int"
+            #else:
+            #    expr[4] = "float"
+            
+            if int(left_value) == left_value and int(right_value) == right_value:
+                result = int(result)
 
             return result
 
@@ -192,13 +225,18 @@ def evaluate_expression(expr, symbol_table, error_list=None):
             return f"Error: {error_message}"
 
     # Si es un número, debemos desglosar el valor numérico de la tupla
-    elif isinstance(expr, tuple) and expr[0] == 'number':
+    elif isinstance(expr, tuple) and (expr[0] == 'number' or expr[0] == 'bool'):
+        #if int(expr[1] == expr[1]):
+        #    expr[4] = "int"
+        #else: 
+        #    expr[4] = "float"
         return expr[1]  # Devolvemos el valor numérico
 
     # Si es un identificador
     elif isinstance(expr, tuple) and expr[0] == 'identifier':
         symbol_info = symbol_table.get_symbol(expr[1])
         if symbol_info:
+            #expr[4] = symbol_info.get('type','none')
             return symbol_info.get('value', 0)
         else:
             error_message = f"Error: La variable '{expr[1]}' no está definida."

@@ -225,18 +225,17 @@ class IDE(tk.Tk):
 
         # Realizar análisis semántico y seguir si hay errores
         if result:
-            self.generate_semantic_analysis(result)
+            self.generate_semantic_analysis(result, tokens)
 
-    def generate_semantic_analysis(self, result):
+    def generate_semantic_analysis(self, result, tokens):
         # Crear una lista para almacenar los errores
         error_list = []
         
         # Realizar análisis semántico
         symbol_table = SymbolTable()
         try:
-            tokens = [tok for tok in custom_lexer]
             annotated_tree = analyze_semantics_with_annotations(result, symbol_table, tokens, error_list)
-            self.populate_symbol_table(symbol_table)
+            self.populate_symbol_table(symbol_table, tokens)
             self.display_semantic_tree_with_annotations(annotated_tree)
             
             # Mostrar los errores acumulados en el área de errores
@@ -309,15 +308,32 @@ class IDE(tk.Tk):
 
 
     
-    def populate_symbol_table(self, symbol_table):
+    def populate_symbol_table(self, symbol_table, custom_lexer):
         # Llenar la tabla de símbolos en la pestaña correspondiente
+        arrData = {}
+        arrDataSimbols = []
         for name, info in symbol_table.symbols.items():
             value = info.get('value', '')
             # Limitar los floats a 4 caracteres
             if isinstance(value, float):
                 value = f"{value:.4f}"
             # Convertir las líneas en un string para mostrar
-            lines = ', '.join(map(str, info['lines']))
+            #lines = ', '.join(map(str, info['lines']))
+            arrData[name] = []
+            arrDataSimbols.append(name)
+
+        for tok in custom_lexer:
+            if tok.value in arrDataSimbols:
+                arrData[tok.value].append(tok.lineno)
+             
+        
+        for name, info in symbol_table.symbols.items():
+            value = info.get('value', '')
+            # Limitar los floats a 4 caracteres
+            if isinstance(value, float):
+                value = f"{value:.4f}"
+            # Convertir las líneas en un string para mostrar
+            lines = ', '.join(map(str, arrData[name]))
             self.symbol_table.insert("", "end", values=(name, info['type'], value, lines))
 
 

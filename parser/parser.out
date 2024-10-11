@@ -2289,18 +2289,8 @@ state 88
     (48) expression -> expression . AND expression
     (49) expression -> expression . OR expression
 
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for EQ resolved as shift
-  ! shift/reduce conflict for LT resolved as shift
-  ! shift/reduce conflict for GT resolved as shift
-  ! shift/reduce conflict for LE resolved as shift
-  ! shift/reduce conflict for GE resolved as shift
-  ! shift/reduce conflict for NE resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
+    PLUS            reduce using rule 38 (expression -> expression PLUS expression .)
+    MINUS           reduce using rule 38 (expression -> expression PLUS expression .)
     LBRACE          reduce using rule 38 (expression -> expression PLUS expression .)
     IDENTIFIER      reduce using rule 38 (expression -> expression PLUS expression .)
     IF              reduce using rule 38 (expression -> expression PLUS expression .)
@@ -2311,8 +2301,6 @@ state 88
     SEMICOLON       reduce using rule 38 (expression -> expression PLUS expression .)
     RPAREN          reduce using rule 38 (expression -> expression PLUS expression .)
     COMMA           reduce using rule 38 (expression -> expression PLUS expression .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 61
     TIMES           shift and go to state 62
     DIVIDE          shift and go to state 63
     EQ              shift and go to state 64
@@ -2324,8 +2312,6 @@ state 88
     AND             shift and go to state 70
     OR              shift and go to state 71
 
-  ! PLUS            [ reduce using rule 38 (expression -> expression PLUS expression .) ]
-  ! MINUS           [ reduce using rule 38 (expression -> expression PLUS expression .) ]
   ! TIMES           [ reduce using rule 38 (expression -> expression PLUS expression .) ]
   ! DIVIDE          [ reduce using rule 38 (expression -> expression PLUS expression .) ]
   ! EQ              [ reduce using rule 38 (expression -> expression PLUS expression .) ]
@@ -2336,6 +2322,8 @@ state 88
   ! NE              [ reduce using rule 38 (expression -> expression PLUS expression .) ]
   ! AND             [ reduce using rule 38 (expression -> expression PLUS expression .) ]
   ! OR              [ reduce using rule 38 (expression -> expression PLUS expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 61 ]
 
 
 state 89
@@ -2354,18 +2342,8 @@ state 89
     (48) expression -> expression . AND expression
     (49) expression -> expression . OR expression
 
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for EQ resolved as shift
-  ! shift/reduce conflict for LT resolved as shift
-  ! shift/reduce conflict for GT resolved as shift
-  ! shift/reduce conflict for LE resolved as shift
-  ! shift/reduce conflict for GE resolved as shift
-  ! shift/reduce conflict for NE resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
+    PLUS            reduce using rule 39 (expression -> expression MINUS expression .)
+    MINUS           reduce using rule 39 (expression -> expression MINUS expression .)
     LBRACE          reduce using rule 39 (expression -> expression MINUS expression .)
     IDENTIFIER      reduce using rule 39 (expression -> expression MINUS expression .)
     IF              reduce using rule 39 (expression -> expression MINUS expression .)
@@ -2376,8 +2354,6 @@ state 89
     SEMICOLON       reduce using rule 39 (expression -> expression MINUS expression .)
     RPAREN          reduce using rule 39 (expression -> expression MINUS expression .)
     COMMA           reduce using rule 39 (expression -> expression MINUS expression .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 61
     TIMES           shift and go to state 62
     DIVIDE          shift and go to state 63
     EQ              shift and go to state 64
@@ -2389,8 +2365,6 @@ state 89
     AND             shift and go to state 70
     OR              shift and go to state 71
 
-  ! PLUS            [ reduce using rule 39 (expression -> expression MINUS expression .) ]
-  ! MINUS           [ reduce using rule 39 (expression -> expression MINUS expression .) ]
   ! TIMES           [ reduce using rule 39 (expression -> expression MINUS expression .) ]
   ! DIVIDE          [ reduce using rule 39 (expression -> expression MINUS expression .) ]
   ! EQ              [ reduce using rule 39 (expression -> expression MINUS expression .) ]
@@ -2401,6 +2375,8 @@ state 89
   ! NE              [ reduce using rule 39 (expression -> expression MINUS expression .) ]
   ! AND             [ reduce using rule 39 (expression -> expression MINUS expression .) ]
   ! OR              [ reduce using rule 39 (expression -> expression MINUS expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 61 ]
 
 
 state 90
@@ -2419,18 +2395,10 @@ state 90
     (48) expression -> expression . AND expression
     (49) expression -> expression . OR expression
 
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for EQ resolved as shift
-  ! shift/reduce conflict for LT resolved as shift
-  ! shift/reduce conflict for GT resolved as shift
-  ! shift/reduce conflict for LE resolved as shift
-  ! shift/reduce conflict for GE resolved as shift
-  ! shift/reduce conflict for NE resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
+    PLUS            reduce using rule 40 (expression -> expression TIMES expression .)
+    MINUS           reduce using rule 40 (expression -> expression TIMES expression .)
+    TIMES           reduce using rule 40 (expression -> expression TIMES expression .)
+    DIVIDE          reduce using rule 40 (expression -> expression TIMES expression .)
     LBRACE          reduce using rule 40 (expression -> expression TIMES expression .)
     IDENTIFIER      reduce using rule 40 (expression -> expression TIMES expression .)
     IF              reduce using rule 40 (expression -> expression TIMES expression .)
@@ -2441,10 +2409,6 @@ state 90
     SEMICOLON       reduce using rule 40 (expression -> expression TIMES expression .)
     RPAREN          reduce using rule 40 (expression -> expression TIMES expression .)
     COMMA           reduce using rule 40 (expression -> expression TIMES expression .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 61
-    TIMES           shift and go to state 62
-    DIVIDE          shift and go to state 63
     EQ              shift and go to state 64
     LT              shift and go to state 65
     GT              shift and go to state 66
@@ -2454,10 +2418,6 @@ state 90
     AND             shift and go to state 70
     OR              shift and go to state 71
 
-  ! PLUS            [ reduce using rule 40 (expression -> expression TIMES expression .) ]
-  ! MINUS           [ reduce using rule 40 (expression -> expression TIMES expression .) ]
-  ! TIMES           [ reduce using rule 40 (expression -> expression TIMES expression .) ]
-  ! DIVIDE          [ reduce using rule 40 (expression -> expression TIMES expression .) ]
   ! EQ              [ reduce using rule 40 (expression -> expression TIMES expression .) ]
   ! LT              [ reduce using rule 40 (expression -> expression TIMES expression .) ]
   ! GT              [ reduce using rule 40 (expression -> expression TIMES expression .) ]
@@ -2466,6 +2426,10 @@ state 90
   ! NE              [ reduce using rule 40 (expression -> expression TIMES expression .) ]
   ! AND             [ reduce using rule 40 (expression -> expression TIMES expression .) ]
   ! OR              [ reduce using rule 40 (expression -> expression TIMES expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 61 ]
+  ! TIMES           [ shift and go to state 62 ]
+  ! DIVIDE          [ shift and go to state 63 ]
 
 
 state 91
@@ -2484,18 +2448,10 @@ state 91
     (48) expression -> expression . AND expression
     (49) expression -> expression . OR expression
 
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for EQ resolved as shift
-  ! shift/reduce conflict for LT resolved as shift
-  ! shift/reduce conflict for GT resolved as shift
-  ! shift/reduce conflict for LE resolved as shift
-  ! shift/reduce conflict for GE resolved as shift
-  ! shift/reduce conflict for NE resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
+    PLUS            reduce using rule 41 (expression -> expression DIVIDE expression .)
+    MINUS           reduce using rule 41 (expression -> expression DIVIDE expression .)
+    TIMES           reduce using rule 41 (expression -> expression DIVIDE expression .)
+    DIVIDE          reduce using rule 41 (expression -> expression DIVIDE expression .)
     LBRACE          reduce using rule 41 (expression -> expression DIVIDE expression .)
     IDENTIFIER      reduce using rule 41 (expression -> expression DIVIDE expression .)
     IF              reduce using rule 41 (expression -> expression DIVIDE expression .)
@@ -2506,10 +2462,6 @@ state 91
     SEMICOLON       reduce using rule 41 (expression -> expression DIVIDE expression .)
     RPAREN          reduce using rule 41 (expression -> expression DIVIDE expression .)
     COMMA           reduce using rule 41 (expression -> expression DIVIDE expression .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 61
-    TIMES           shift and go to state 62
-    DIVIDE          shift and go to state 63
     EQ              shift and go to state 64
     LT              shift and go to state 65
     GT              shift and go to state 66
@@ -2519,10 +2471,6 @@ state 91
     AND             shift and go to state 70
     OR              shift and go to state 71
 
-  ! PLUS            [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
-  ! MINUS           [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
-  ! TIMES           [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
-  ! DIVIDE          [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
   ! EQ              [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
   ! LT              [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
   ! GT              [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
@@ -2531,6 +2479,10 @@ state 91
   ! NE              [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
   ! AND             [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
   ! OR              [ reduce using rule 41 (expression -> expression DIVIDE expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 61 ]
+  ! TIMES           [ shift and go to state 62 ]
+  ! DIVIDE          [ shift and go to state 63 ]
 
 
 state 92
@@ -3295,54 +3247,6 @@ WARNING: shift/reduce conflict for DO in state 75 resolved as shift
 WARNING: shift/reduce conflict for WRITE in state 75 resolved as shift
 WARNING: shift/reduce conflict for READ in state 75 resolved as shift
 WARNING: shift/reduce conflict for LBRACE in state 75 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 88 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 88 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 88 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 88 resolved as shift
-WARNING: shift/reduce conflict for EQ in state 88 resolved as shift
-WARNING: shift/reduce conflict for LT in state 88 resolved as shift
-WARNING: shift/reduce conflict for GT in state 88 resolved as shift
-WARNING: shift/reduce conflict for LE in state 88 resolved as shift
-WARNING: shift/reduce conflict for GE in state 88 resolved as shift
-WARNING: shift/reduce conflict for NE in state 88 resolved as shift
-WARNING: shift/reduce conflict for AND in state 88 resolved as shift
-WARNING: shift/reduce conflict for OR in state 88 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 89 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 89 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 89 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 89 resolved as shift
-WARNING: shift/reduce conflict for EQ in state 89 resolved as shift
-WARNING: shift/reduce conflict for LT in state 89 resolved as shift
-WARNING: shift/reduce conflict for GT in state 89 resolved as shift
-WARNING: shift/reduce conflict for LE in state 89 resolved as shift
-WARNING: shift/reduce conflict for GE in state 89 resolved as shift
-WARNING: shift/reduce conflict for NE in state 89 resolved as shift
-WARNING: shift/reduce conflict for AND in state 89 resolved as shift
-WARNING: shift/reduce conflict for OR in state 89 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 90 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 90 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 90 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 90 resolved as shift
-WARNING: shift/reduce conflict for EQ in state 90 resolved as shift
-WARNING: shift/reduce conflict for LT in state 90 resolved as shift
-WARNING: shift/reduce conflict for GT in state 90 resolved as shift
-WARNING: shift/reduce conflict for LE in state 90 resolved as shift
-WARNING: shift/reduce conflict for GE in state 90 resolved as shift
-WARNING: shift/reduce conflict for NE in state 90 resolved as shift
-WARNING: shift/reduce conflict for AND in state 90 resolved as shift
-WARNING: shift/reduce conflict for OR in state 90 resolved as shift
-WARNING: shift/reduce conflict for PLUS in state 91 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 91 resolved as shift
-WARNING: shift/reduce conflict for TIMES in state 91 resolved as shift
-WARNING: shift/reduce conflict for DIVIDE in state 91 resolved as shift
-WARNING: shift/reduce conflict for EQ in state 91 resolved as shift
-WARNING: shift/reduce conflict for LT in state 91 resolved as shift
-WARNING: shift/reduce conflict for GT in state 91 resolved as shift
-WARNING: shift/reduce conflict for LE in state 91 resolved as shift
-WARNING: shift/reduce conflict for GE in state 91 resolved as shift
-WARNING: shift/reduce conflict for NE in state 91 resolved as shift
-WARNING: shift/reduce conflict for AND in state 91 resolved as shift
-WARNING: shift/reduce conflict for OR in state 91 resolved as shift
 WARNING: reduce/reduce conflict in state 58 resolved using rule (statement -> block)
 WARNING: rejected rule (empty -> <empty>) in state 58
 WARNING: reduce/reduce conflict in state 105 resolved using rule (statement -> block)
