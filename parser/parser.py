@@ -1,5 +1,14 @@
 import ply.yacc as yacc
 
+# Definir la precedencia de los operadores
+precedence = (
+    ('left', 'OR'),
+    ('left', 'AND'),
+    ('left', 'EQ', 'NE'),
+    ('left', 'LT', 'LE', 'GT', 'GE'),
+    ('right', 'UMINUS', 'NOT'),  # Aquí se define la precedencia de UMINUS y NOT
+)
+
 # Definir los tokens
 tokens = (
     'IDENTIFIER',
@@ -8,7 +17,6 @@ tokens = (
     'MINUS',
     'TIMES',
     'DIVIDE',
-    'POWER',
     'LT',
     'LE',
     'GT',
@@ -40,17 +48,6 @@ tokens = (
     'BOOL',
     'TRUE',
     'FALSE'
-)
-
-# Definir la precedencia de los operadores
-precedence = (
-    ('left', 'OR'),
-    ('left', 'AND'),
-    ('left', 'EQ', 'NE'),
-    ('left', 'LT', 'LE', 'GT', 'GE'),
-    ('left', 'PLUS', 'MINUS'),
-    ('left', 'TIMES', 'DIVIDE'),
-    ('right', 'UMINUS', 'NOT'),
 )
 
 # Definir la gramática
@@ -111,12 +108,23 @@ def p_statement(p):
                  | do_while_statement
                  | write_statement
                  | read_statement
-                 | block'''
+                 | block
+                 | increment
+                 | decrement'''
     p[0] = p[1]
 
 def p_assignment(p):
     '''assignment : IDENTIFIER ASSIGN expression SEMICOLON'''
     p[0] = ('assignment', p[1], p[3])
+
+# Reglas para incrementos y decrementos con punto y coma
+def p_increment(p):
+    'increment : IDENTIFIER PLUS PLUS SEMICOLON'
+    p[0] = ('increment', p[1])
+
+def p_decrement(p):
+    'decrement : IDENTIFIER MINUS MINUS SEMICOLON'
+    p[0] = ('decrement', p[1])
 
 def p_if_statement(p):
     '''if_statement : IF expression block else_part FI
@@ -157,7 +165,6 @@ def p_expression_binop(p):
                   | expression MINUS expression
                   | expression TIMES expression
                   | expression DIVIDE expression
-                  | expression POWER expression
                   | expression EQ expression
                   | expression LT expression
                   | expression GT expression
@@ -201,11 +208,11 @@ def p_error(p):
     if p:
         error_message = f"Syntax error at '{p.value}', line {p.lineno}"
         parser.errors.append(error_message)
-        print(error_message)  # Agregar esta línea para depuración en tiempo real
+        print(error_message)
         return ('error', f"Error at '{p.value}' on line {p.lineno}")
     else:
         parser.errors.append("Syntax error at EOF")
-        print("Syntax error at EOF")  # Depuración en tiempo real
+        print("Syntax error at EOF")
         return ('error', "Error at EOF")
 
 parser = yacc.yacc()

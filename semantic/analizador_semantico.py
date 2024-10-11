@@ -21,7 +21,7 @@ class SemanticNodeWithAnnotations(SemanticNode):
     def __repr__(self):
         annotations_str = ', '.join([f'{k}: {v}' for k, v in self.annotations.items()])
         return f"{self.node_type} (annotations: {annotations_str}) -> {self.children}"
-
+    
 def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=None):
     if isinstance(ast, tuple):
         node_type = ast[0]
@@ -64,14 +64,20 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
                 if error_list is not None:
                     error_list.append(error_message)
 
-            semantic_node.add_child(analyze_semantics_with_annotations(ast[2], symbol_table, tokens, error_list))
+            expr_node = analyze_semantics_with_annotations(ast[2], symbol_table, tokens, error_list)
+            semantic_node.add_child(expr_node)
             return semantic_node
 
-        # Procesar binop
-        if node_type == 'binop':
+       # Procesar binop (operaciones binarias)
+        elif node_type == 'binop':
+            operator = ast[1]
+
+            # **Procesar primero el operando izquierdo para que sea el primero en evaluarse**
+            left_child = analyze_semantics_with_annotations(ast[2], symbol_table, tokens, error_list)
+            right_child = analyze_semantics_with_annotations(ast[3], symbol_table, tokens, error_list)
+
             left_value = evaluate_expression(ast[2], symbol_table, error_list=error_list)
             right_value = evaluate_expression(ast[3], symbol_table, error_list=error_list)
-            operator = ast[1]
 
             operation = f"{left_value} {operator} {right_value}"
             result = evaluate_expression(ast, symbol_table, error_list=error_list)
@@ -79,10 +85,12 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
             semantic_node.add_annotation("operation", operation)
             semantic_node.add_annotation("result", result)
 
-            semantic_node.add_child(analyze_semantics_with_annotations(ast[2], symbol_table, tokens, error_list))
-            semantic_node.add_child(analyze_semantics_with_annotations(ast[3], symbol_table, tokens, error_list))
+            # **Agregar el hijo izquierdo primero para que quede más profundo y se evalúe antes**
+            semantic_node.add_child(left_child)
+            semantic_node.add_child(right_child)
 
             return semantic_node
+
 
         # Procesar nodos recursivamente
         for child in ast[1:]:
@@ -109,8 +117,8 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
     elif isinstance(ast, tuple) and ast[0] == 'bool':
         value = True if ast[1] == 'true' else False
         node = SemanticNodeWithAnnotations(f"bool ({ast[1]})", value)
-        node.add_annotation("type", "bool")  # Asegurarse de que el tipo sea 'bool'
-        node.add_annotation("value", value)  # El valor será True o False
+        node.add_annotation("type", "bool")
+        node.add_annotation("value", value)
         return node
 
     # Identificadores
@@ -133,14 +141,19 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
     return SemanticNodeWithAnnotations("literal", ast)
 
 
+
+
+
 def evaluate_expression(expr, symbol_table, error_list=None):
+    # Verificamos si es un binop (operación binaria)
     if isinstance(expr, tuple) and expr[0] == 'binop':
         op = expr[1]
+        # Evaluamos primero el operando izquierdo, y luego el derecho
         left_value = evaluate_expression(expr[2], symbol_table, error_list=error_list)
         right_value = evaluate_expression(expr[3], symbol_table, error_list=error_list)
 
         try:
-            # Evaluar operadores aritméticos, de comparación y lógicos
+            # Evaluar operaciones aritméticas de izquierda a derecha
             if op == '+':
                 result = left_value + right_value
             elif op == '-':
@@ -149,6 +162,8 @@ def evaluate_expression(expr, symbol_table, error_list=None):
                 result = left_value * right_value
             elif op == '/':
                 result = left_value / right_value
+
+            # Evaluar operadores de comparación
             elif op == '>':
                 result = left_value > right_value
             elif op == '<':
@@ -161,12 +176,14 @@ def evaluate_expression(expr, symbol_table, error_list=None):
                 result = left_value == right_value
             elif op == '!=':
                 result = left_value != right_value
+
+            # Evaluar operadores lógicos
             elif op == 'and':
-                result = left_value and right_value  # Evaluación de 'and'
+                result = left_value and right_value
             elif op == 'or':
-                result = left_value or right_value   # Evaluación de 'or'
-            else:
-                result = None
+                result = left_value or right_value
+
+            return result
 
         except (TypeError, ValueError) as e:
             error_message = f"Error en la operación {left_value} {op} {right_value}: {e}"
@@ -174,15 +191,11 @@ def evaluate_expression(expr, symbol_table, error_list=None):
                 error_list.append(error_message)
             return f"Error: {error_message}"
 
-        return result
-
-    elif isinstance(expr, tuple) and expr[0] == 'bool':
-        # Devolver True o False según el valor
-        return True if expr[1] == 'true' else False
-
+    # Si es un número, debemos desglosar el valor numérico de la tupla
     elif isinstance(expr, tuple) and expr[0] == 'number':
-        return expr[1]
+        return expr[1]  # Devolvemos el valor numérico
 
+    # Si es un identificador
     elif isinstance(expr, tuple) and expr[0] == 'identifier':
         symbol_info = symbol_table.get_symbol(expr[1])
         if symbol_info:
@@ -193,24 +206,17 @@ def evaluate_expression(expr, symbol_table, error_list=None):
                 error_list.append(error_message)
             return 0  # Valor predeterminado si no existe la variable
 
+    # En otros casos, devolver el valor tal cual
     return expr
 
 
 
 
-       
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
 
     def add_symbol(self, name, symbol_info):
-        # Verificar si la variable ya ha sido declarada con un tipo diferente
-        if name in self.symbols:
-            existing_type = self.symbols[name]['type']
-            if existing_type != symbol_info['type']:
-                print(f"Error: La variable '{name}' ya ha sido declarada como {existing_type}.")
-                return  # No sobreescribir la entrada existente con un tipo diferente
-        # Asegurarnos de que siempre exista la clave 'lines'
         if 'lines' not in symbol_info:
             symbol_info['lines'] = []
         self.symbols[name] = symbol_info
@@ -222,4 +228,3 @@ class SymbolTable:
         if 'lines' not in symbol_info:
             symbol_info['lines'] = []
         self.symbols[name] = symbol_info
-
