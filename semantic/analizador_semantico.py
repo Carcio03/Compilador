@@ -57,20 +57,41 @@ def analyze_semantics_with_annotations(ast, symbol_table, tokens, error_list=Non
             var_name = ast[1]
             value = evaluate_expression(ast[2], symbol_table, error_list=error_list)
             symbol_info = symbol_table.get_symbol(var_name)
+
+            # Crear el nodo de la asignación vacío
+            semantic_node = SemanticNodeWithAnnotations("assignment")
+            
             if symbol_info:
-                symbol_info['value'] = value
-                symbol_table.update_symbol(var_name, symbol_info)
-                semantic_node.add_annotation("variable", var_name)
-                semantic_node.add_annotation("type", symbol_info['type'])
-                semantic_node.add_annotation("value", value)
+                # Obtener el tipo de la variable y el tipo de la expresión evaluada
+                var_type = symbol_info['type']
+                expr_type = 'int' if isinstance(value, int) else 'float'
+
+                # Verificar si hay una inconsistencia en el tipo
+                if var_type == 'int' and expr_type == 'float':
+                    error_message = f"Error: Asignación inválida, no se puede asignar un valor de tipo 'float' a la variable '{var_name}' de tipo 'int'."
+                    if error_list is not None:
+                        error_list.append(error_message)
+                    # Si hay error, no añadir detalles en el nodo (se queda vacío)
+                else:
+                    symbol_info['value'] = value
+                    symbol_table.update_symbol(var_name, symbol_info)
+                    semantic_node.add_annotation("variable", var_name)
+                    semantic_node.add_annotation("type", symbol_info['type'])
+                    semantic_node.add_annotation("value", value)
             else:
                 error_message = f"Error: La variable '{var_name}' no está definida."
                 if error_list is not None:
                     error_list.append(error_message)
+                # Si hay error, no añadir detalles en el nodo (se queda vacío)
 
+            # Añadir la expresión al nodo de la asignación solo si no hubo error
             expr_node = analyze_semantics_with_annotations(ast[2], symbol_table, tokens, error_list)
-            semantic_node.add_child(expr_node)
+            if expr_node:
+                semantic_node.add_child(expr_node)
+
             return semantic_node
+
+
 
        # Procesar binop (operaciones binarias)
         elif node_type == 'binop':
@@ -184,28 +205,9 @@ def evaluate_expression(expr, symbol_table, error_list=None):
 
             # Evaluar operadores lógicos
             elif op == 'and':
-                if left_value == 1:
-                    left_value = True
-                elif left_value == 0:
-                    left_value = False
-                
-                if right_value == 1:
-                    right_value = True
-                elif right_value == 0:
-                    right_value = False
-                
-                result = left_value and right_value
+                result = bool(left_value) and bool(right_value)
             elif op == 'or':
-                if left_value == 1:
-                    left_value = True
-                elif left_value == 0:
-                    left_value = False
-                
-                if right_value == 1:
-                    right_value = True
-                elif right_value == 0:
-                    right_value = False
-                result = left_value or right_value
+                result = bool(left_value) or bool(right_value)
 
             #if expr[2][4] == "int" and expr[3][4] == "int":
             #    result = int(result)
@@ -213,6 +215,8 @@ def evaluate_expression(expr, symbol_table, error_list=None):
             #else:
             #    expr[4] = "float"
             
+            if isinstance(result, bool):
+                return result
             if int(left_value) == left_value and int(right_value) == right_value:
                 result = int(result)
 
